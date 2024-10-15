@@ -43,7 +43,7 @@ UART_HandleTypeDef *huartDebug = &huart2;
 #else
 UART_HandleTypeDef *huartDebug = &huart4;
 #endif
-SBUS_HANDLE hsbus(lower,center, upper);
+SBUS_HANDLE hsbus(sbusLower,sbusCenter, sbusUpper);
 
 inline float degToRad(float deg){
 	return deg*std::numbers::pi / 180.0;
@@ -118,18 +118,11 @@ multicopter::PARAMETER defaultParam(rollParam, pitchParam, yawRateParam,altitude
 multicopter::MULTICOPTER *hmulticopter = new multicopter::MULTICOPTER(smooth_angulerRate,defaultParam,deltaTimer);
 multicopter::INPUT multicopterInput;
 
-std::array<ESC_UTILITY_SINGLE*, 8> escSingle = {
-    new ESC_UTILITY_SINGLE(&htim8,TIM_CHANNEL_1,1500,3000),
-    new ESC_UTILITY_SINGLE(&htim8,TIM_CHANNEL_2,1500,3000),
-    new ESC_UTILITY_SINGLE(&htim8,TIM_CHANNEL_3,1500,3000),
-    new ESC_UTILITY_SINGLE(&htim8,TIM_CHANNEL_4,1500,3000),
-
-	new ESC_UTILITY_SINGLE(&htim3,TIM_CHANNEL_4,1500,3000),
-	new ESC_UTILITY_SINGLE(&htim3,TIM_CHANNEL_3,1500,3000),
-	new ESC_UTILITY_SINGLE(&htim3,TIM_CHANNEL_2,1500,3000),
-	new ESC_UTILITY_SINGLE(&htim3,TIM_CHANNEL_1,1500,3000),
-};
-ESC_UTILITY<8> esc(escSingle);
+std::array<uint8_t,25> sbusTxBuffer = {};
+inline void enableUpperESC(){HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);}
+inline void disableUpperESC(){HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET);}
+inline void enableLowerESC(){HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);}
+inline void disableLowerESC(){HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);}
 
 uint32_t adcValue = 0;
 

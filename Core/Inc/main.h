@@ -57,8 +57,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define SBUS_Pin GPIO_PIN_3
-#define SBUS_GPIO_Port GPIOA
 #define ICM20948_IT_Pin GPIO_PIN_2
 #define ICM20948_IT_GPIO_Port GPIOB
 #define ICM20948_IT_EXTI_IRQn EXTI2_IRQn
@@ -66,6 +64,10 @@ void Error_Handler(void);
 #define SERVO_1_GPIO_Port GPIOB
 #define SERVO_2_Pin GPIO_PIN_15
 #define SERVO_2_GPIO_Port GPIOB
+#define sbus_tx_Pin GPIO_PIN_6
+#define sbus_tx_GPIO_Port GPIOC
+#define sbus_rx_Pin GPIO_PIN_2
+#define sbus_rx_GPIO_Port GPIOD
 
 /* USER CODE BEGIN Private defines */
 

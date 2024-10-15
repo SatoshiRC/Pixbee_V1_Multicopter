@@ -33,28 +33,30 @@ float initialBankAcceleLim = 540*std::numbers::pi / 180.0;
 float initialYawRateLim = 90*std::numbers::pi / 180.0;
 
 //sbus calibration values
-std::array<uint16_t, 18> center = {
+std::array<uint16_t, 18> sbusCenter = {
     1500, 1500, 966, 966,
-    1500, 1500, 1500, 1500,
+    1024, 1500, 1500, 1500,
     1500, 1500, 1500, 1500,
     1500, 1500, 1500, 1500,
     0, 0
 };
 
-std::array<uint16_t, 18> upper = {
+std::array<uint16_t, 18> sbusUpper = {
 	1680, 1680, 1680, 1680,
-	1904, 1904, 1904, 1904,
+	144, 2070, 1904, 1904,
 	1904, 1904, 1500, 1500,
     1500, 1500, 1500, 1500,
     0, 0
 };
 
-std::array<uint16_t, 18> lower = {
+std::array<uint16_t, 18> sbusLower = {
 	368, 368, 368, 368,
-	144, 144, 144, 144,
+	1904, 970, 144, 144,
 	144, 144, 1500, 1500,
     1500, 1500, 1500, 1500,
     0, 0
 };
 
 Quaternion<float> imuFrame(1/std::sqrt(2),0,0,-1/std::sqrt(2));
+
+uint8_t adcTh=30;

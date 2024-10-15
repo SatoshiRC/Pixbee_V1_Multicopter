@@ -18,6 +18,8 @@ extern "C" {
 void init(void);
 void loop(void);
 
+void semiAutoDrop(uint16_t servo=1200, bool isAuto=false, uint8_t photoTransista=255);
+
 void tim14Callback();
 
 void debug();
