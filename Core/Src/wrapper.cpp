@@ -33,6 +33,8 @@ static void message(std::string str, uint8_t level = 3);
 std::array<float, 3> gyroValue;
 std::array<float, 3> AccelValue;
 
+DeltaTime processingTimeMesure(elapsedTimer);
+
 void init(){
 	SET_MASK_ICM20948_INTERRUPT();
 
@@ -48,17 +50,18 @@ void init(){
 	__HAL_TIM_SET_COMPARE(ledTim, BLUE_LED_CHANNEL, 0);
 
 
-//	esc.enable();
+	esc.enable();
+	esc.arm();
 //	esc.calibration();
 //
-//	HAL_Delay(5000);
-//	for(uint8_t n=0; n<8; n++){
-//		std::array<float, 8> sp={};
-//		sp[n] = 0.1;
-//		esc.setSpeed(sp);
-//		HAL_Delay(3000);
-//		esc.setSpeed(0);
-//	}
+	HAL_Delay(5000);
+	for(uint8_t n=0; n<8; n++){
+		std::array<float, 8> sp={};
+		sp[n] = 0.1;
+		esc.setSpeed(sp);
+		HAL_Delay(3000);
+		esc.setSpeed(0);
+	}
 
 	//start to receive sbus.
 	HAL_UART_Receive_DMA(huartSbus,hsbus.getReceiveBufferPtr(),hsbus.getDataLen());
@@ -138,6 +141,8 @@ void icm20948CallbackCalibration(){
 }
 
 void icm20948Callback(){
+	processingTimeMesure.update_dt();
+
 	Vector3D<float> accel;
 	Vector3D<float> gyro;
 
@@ -149,17 +154,19 @@ void icm20948Callback(){
 
 	icm20948User.getIMU(accel, gyro);
 
-	float lpfCoff = std::exp(-dt*(800*std::numbers::pi)/1000.0);
-	filteredAccel = filteredAccel*(lpfCoff)+accel*(1-lpfCoff);
+//1600us -> 570us
 
-	lpfCoff = std::exp(-dt*(800*std::numbers::pi)/1000.0);
+	float lpfCoff = std::exp(-dt*(800*std::numbers::pi)/1000.0);
+//	filteredAccel = filteredAccel*(lpfCoff)+accel*(1-lpfCoff);
+
 	filteredGyro[2] = filteredGyro[2]*(lpfCoff)+gyro[2]*(1-lpfCoff);
 	filteredGyro[1] = gyro[1];
 	filteredGyro[0] = gyro[0];
 
-	const float accelNorm = accel.norm();
+//	const float accelNorm = accel.norm();
 
-	attitudeEstimate.setAccelValue(filteredAccel);
+
+	attitudeEstimate.setAccelValue(accel);
 	attitudeEstimate.setGyroValue(filteredGyro);
 	attitudeEstimate.update();
 
@@ -230,7 +237,6 @@ void icm20948Callback(){
 	float roll = -tmpVec[0];
 	float pitch = tmpVec[1];
 
-
 	yawAverage.push(yaw);
 
 	float yawRate = 0;
@@ -246,13 +252,17 @@ void icm20948Callback(){
 	multicopterInput.roll = roll;
 	multicopterInput.pitch = pitch;
 	multicopterInput.yawRate = yawRate;
+
+
 	auto res = hmulticopter->controller(multicopterInput);
 	esc.setSpeed(res);
 
+
 //	message(std::to_string(adcValue));
 //	message(filteredAccel.string2() +", " +accel.string2()+", "+std::to_string(int16_t(lpfCoff*100)));
+	message(accel.string2());
 //	message(accel.string2()+","+std::to_string(int16_t(roll*180/std::numbers::pi))+", "+std::to_string(int16_t(pitch*180/std::numbers::pi)));
-//	message(std::to_string(int16_t(roll*180/std::numbers::pi))+", "+std::to_string(int16_t(pitch*180/std::numbers::pi))+", "+std::to_string(int16_t(yaw*180/std::numbers::pi))+", "+attitude.string());
+//	message(std::to_string(int16_t(roll*180/std::numbers::pi))+", "+std::to_string(int16_t(pitch*180/std::numbers::pi))+", "+std::to_string(int16_t(yaw*180/std::numbers::pi)));
 //	message(std::to_string(int16_t(roll*180/std::numbers::pi))+", "+std::to_string(int16_t(pitch*180/std::numbers::pi))+", "+std::to_string(int16_t(yaw*180/std::numbers::pi))+", "+hmulticopter->getSmoothValue()+", "+std::to_string(int16_t(yawRate*180/std::numbers::pi)));
 //	message(std::to_string(int16_t(yaw*180/std::numbers::pi))+", "+ std::to_string(int16_t(smooth_angulerRate->at(2)->getAverage()*180/std::numbers::pi)) + ", " + std::to_string(int16_t(gyro[2]*180/std::numbers::pi))+ ", " + std::to_string(int16_t(yawRate*180/std::numbers::pi)));
 //	message(std::to_string(int16_t(roll*180/std::numbers::pi))+", "+ std::to_string(int16_t(smooth_angulerRate->at(0)->getAverage()*180/std::numbers::pi)) + ", " + std::to_string(int16_t(multicopterInput.rollRate*180/std::numbers::pi)) + ", " + std::to_string(int16_t(gyro[0]*180/std::numbers::pi))+", "+hmulticopter->getCotrolValue());

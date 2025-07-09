@@ -12,7 +12,7 @@
  * ff_max < 0.015
  *
  */
-auto *rollParam = new TWO_DOF_PID_PARAM<float>(0.010,0.01 ,0.003,0.00001,0.15,-0.15);
+auto *rollParam = new TWO_DOF_PID_PARAM<float>(0.010,0.01 ,0.003,0.00001,0.05,-0.05);
 //auto *rollParam = new TWO_DOF_PID_PARAM<float>(0,0.00975 ,0.000975,0.00018,0.15,-0.15);
 //auto *rollParam = new TWO_DOF_PID_PARAM<float>(0,0.00975 ,0.000975,0.000109,0.15,-0.15);
 auto *pitchParam = rollParam;
@@ -23,7 +23,7 @@ auto *pitchParam = rollParam;
 //auto *pitchParam = new TWO_DOF_PID_PARAM<float>(0,0.0 ,0.000,0.000,0.2,-0.2);
 //auto *rollParam = new TWO_DOF_PID_PARAM<float>(0,1,0.0000,0.0000,0.03,-0.03);
 //auto *yawRateParam = new TWO_DOF_PID_PARAM<float>(0.0,0.0,0.00,0.00000,0.05,-0.05);
-auto *yawRateParam = new TWO_DOF_PID_PARAM<float>(0.05,0.08,0.002,0.000001,0.1,-0.1);
+auto *yawRateParam = new TWO_DOF_PID_PARAM<float>(0.05,0.08,0.002,0.000001,0.05,-0.05);
 //auto *yawRateParam = new TWO_DOF_PID_PARAM<float>(0.2,0.0,0.0,0.00000,0.05,-0.05);
 auto *altitudeParam = new TWO_DOF_PID_PARAM<float>(0,0.1,0,0.05,0.2,-0.2);
 multicopter::ALTITUDE_CONTROL_MODE initialAltitudeControl = multicopter::ALTITUDE_CONTROL_MODE::RELATIVE_THROTTLE;
@@ -57,4 +57,4 @@ std::array<uint16_t, 18> lower = {
     0, 0
 };
 
-Quaternion<float> imuFrame(1/std::sqrt(2),0,0,-1/std::sqrt(2));
+Quaternion<float> imuFrame = Quaternion<float>(cos(0*std::numbers::pi/180),0,sin(0*std::numbers::pi/180),0) * Quaternion<float>(1/std::sqrt(2),0,0,-1/std::sqrt(2));
